@@ -1,0 +1,4 @@
+name: TAD_Character_Wizard
+version: '${project.version}'
+main: jp.houlab.mochidsuki.tad_character_wizard.TAD_Character_Wizard
+api-version: '1.20'
