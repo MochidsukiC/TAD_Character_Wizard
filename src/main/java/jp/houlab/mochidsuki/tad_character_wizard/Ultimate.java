@@ -43,7 +43,7 @@ public class Ultimate extends BukkitRunnable{
         for(double a = -1*x/2; a<x/2; a++){
             double b;
             b =r*Math.sin(Math.toRadians(18));
-            location.getWorld().spawnParticle(Particle.END_ROD,location.clone().add(new Vector(a/10,b/10,1).rotateAroundX(pitch).rotateAroundY(yaw).rotateAroundZ(Math.toRadians(times))),3,0,0,0,0);
+            location.getWorld().spawnParticle(Particle.END_ROD,location.clone().add(new Vector(a/10,b/10,1).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
         }
 
         //fB
