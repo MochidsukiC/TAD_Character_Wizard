@@ -43,35 +43,35 @@ public class Ultimate extends BukkitRunnable{
         for(double a = -1*x/2; a<x/2; a++){
             double b;
             b =r*Math.sin(Math.toRadians(18));
-            location.getWorld().spawnParticle(Particle.END_ROD,location.clone().add(new Vector(a/10,b/10,1).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
+            location.getWorld().spawnParticle(Particle.END_ROD,location.clone().add(new Vector(a/10,b/10,1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
         }
 
         //fB
         for(double a = -1*x/2; a< (-1 * x) /2 + x*Math.cos(Math.toRadians(36)) ; a++){
             double b;
             b = -1*a*tan36 - (x/2*tan36 - x/2*tan18);
-            location.getWorld().spawnParticle(Particle.END_ROD,location.clone().add(new Vector(a/10,b/10,1).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
+            location.getWorld().spawnParticle(Particle.END_ROD,location.clone().add(new Vector(a/10,b/10,1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
         }
 
         //fC
         for(double a = 0; a< (-1 * x) /2 + x*Math.cos(Math.toRadians(36)) ; a++){
             double b;
             b = -1*a*tan72 + r;
-            location.getWorld().spawnParticle(Particle.END_ROD,location.clone().add(new Vector(a/10,b/10,1).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
+            location.getWorld().spawnParticle(Particle.END_ROD,location.clone().add(new Vector(a/10,b/10,1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
         }
 
         //fD
         for(double a = (int) (x/2 - x*Math.cos(Math.toRadians(36))); a< 0; a++){
             double b;
             b = a*tan72 + r;
-            location.getWorld().spawnParticle(Particle.END_ROD,location.clone().add(new Vector(a/10,b/10,1).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
+            location.getWorld().spawnParticle(Particle.END_ROD,location.clone().add(new Vector(a/10,b/10,1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
         }
 
         //fE
         for(double a = x/2 - x*Math.cos(Math.toRadians(36)); a< x/2; a++){
             double b;
             b = (int) (a*tan36 - (x/2*tan36 - x/2*tan18));
-            location.getWorld().spawnParticle(Particle.END_ROD,location.clone().add(new Vector(a/10,b/10,1).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
+            location.getWorld().spawnParticle(Particle.END_ROD,location.clone().add(new Vector(a/10,b/10,1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
         }
 
         //fF
@@ -81,9 +81,9 @@ public class Ultimate extends BukkitRunnable{
             c = r*Math.cos(Math.toRadians(a));
             b = r*Math.sin(Math.toRadians(a));
             Location locationTemp = location.clone();
-            location.getWorld().spawnParticle(Particle.END_ROD,locationTemp.clone().add(new Vector(c/10,b/10,1).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
-            location.getWorld().spawnParticle(Particle.END_ROD,locationTemp.clone().add(new Vector(c/8,b/8,1).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
-            location.getWorld().spawnParticle(Particle.END_ROD,locationTemp.clone().add(new Vector(c/40,b/40,1).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
+            location.getWorld().spawnParticle(Particle.END_ROD,locationTemp.clone().add(new Vector(c/10,b/10,1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
+            location.getWorld().spawnParticle(Particle.END_ROD,locationTemp.clone().add(new Vector(c/8,b/8,1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
+            location.getWorld().spawnParticle(Particle.END_ROD,locationTemp.clone().add(new Vector(c/40,b/40,1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
             
         }
         int prepareTime = config.getInt("Ultimate.prepareTime");
@@ -103,7 +103,7 @@ public class Ultimate extends BukkitRunnable{
         }else {
             if(times <= prepareTime+runTime){
                 if(times == prepareTime) {
-                    blockDisplay = location.getWorld().spawn(location.clone().add(new Vector(0, 0, 1).rotateAroundX(pitch).rotateAroundY(yaw)), BlockDisplay.class);
+                    blockDisplay = location.getWorld().spawn(location.clone().add(new Vector(0, 0, 1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)), BlockDisplay.class);
                 }else {
                     if(times <= prepareTime + 10){
 
