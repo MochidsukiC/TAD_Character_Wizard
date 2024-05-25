@@ -5,6 +5,6 @@ Ultimate:
   r: 30
   #単位はtick
   prepareTime: 200
-  attackTIme: 40
+  attackTime: 40
   #単位は1ブロック
   long: 40

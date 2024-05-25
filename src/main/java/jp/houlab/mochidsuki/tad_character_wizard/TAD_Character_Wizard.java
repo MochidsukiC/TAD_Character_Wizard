@@ -17,7 +17,7 @@ static public Plugin plugin;
         plugin = this;
 
         //config
-        saveConfig();
+        saveDefaultConfig();
         config = getConfig();
 
         //command

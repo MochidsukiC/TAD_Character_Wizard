@@ -1,24 +1,25 @@
 package jp.houlab.mochidsuki.tad_character_wizard;
 
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
-import org.joml.Vector3f;
 
 import static jp.houlab.mochidsuki.tad_character_wizard.TAD_Character_Wizard.config;
+import static jp.houlab.mochidsuki.tad_character_wizard.TAD_Character_Wizard.plugin;
 
 public class Ultimate extends BukkitRunnable{
     final private Location location;
     final private Player player;
     final private double pitch;
     final private double yaw;
-    private BlockDisplay blockDisplay;
     private int times;
     Ultimate(Location location, Player player){
         this.location = location;
@@ -32,7 +33,7 @@ public class Ultimate extends BukkitRunnable{
         times++;
     }
     private void spawnParticle(Location location, Player player,int times){
-        int r = config.getInt("Ultimate.r");
+        final int r = config.getInt("Ultimate.r");
         double tan72 = Math.tan(Math.toRadians(72));
         double tan36 = Math.tan(Math.toRadians(36));
         double tan18 = Math.tan(Math.toRadians(18));
@@ -86,8 +87,8 @@ public class Ultimate extends BukkitRunnable{
             location.getWorld().spawnParticle(Particle.END_ROD,locationTemp.clone().add(new Vector(c/40,b/40,1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)),3,0,0,0,0);
             
         }
-        int prepareTime = config.getInt("Ultimate.prepareTime");
-        int runTime = config.getInt("Ultimate.attackTime");
+        final int prepareTime = config.getInt("Ultimate.prepareTime");
+        final int runTime = config.getInt("Ultimate.attackTime");
         if(times < prepareTime){
             if(times <= prepareTime/5){
                 spawnCircleParticle(Particle.DUST_COLOR_TRANSITION,times*10,r,9,new Particle.DustTransition(Color.BLUE,Color.AQUA,2));
@@ -100,25 +101,15 @@ public class Ultimate extends BukkitRunnable{
             }else {
                 spawnCircleParticle(Particle.DUST_COLOR_TRANSITION,times*10,r,9,new Particle.DustTransition(Color.ORANGE,Color.RED,2));
             }
-        }else {
-            if(times <= prepareTime+runTime){
-                if(times == prepareTime) {
-                    blockDisplay = location.getWorld().spawn(location.clone().add(new Vector(0, 0, 1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)), BlockDisplay.class);
-                }else {
-                    if(times <= prepareTime + 10){
-
-
-                        blockDisplay.teleport(location.clone().add(new Vector(0,0,config.getInt("Ultimate.long")*(times - prepareTime)/10).rotateAroundX(pitch).rotateAroundY(yaw)));
-                        blockDisplay.setDisplayWidth((float) (2*config.getDouble("Ultimate.long")*(times - prepareTime)/10));
-                        blockDisplay.setRotation((float) yaw, (float) pitch);
-                        //blockDisplay.setTransformation(new Transformation(blockDisplay.getTransformation().getTranslation(),blockDisplay.getTransformation().getLeftRotation(),new Vector3f(),blockDisplay.getTransformation().getRightRotation()));
-                    }
-                }
-            }else {
-                cancel();
-            }
+        } else if (times == prepareTime) {
+            new ControlUltBlockDisplay(0,location,pitch,yaw,r,runTime).runTaskTimer(plugin,0,1);
         }
-    }
+
+        if(times > prepareTime+runTime) {
+            cancel();
+        }
+        }
+
     private void spawnCircleParticle(Particle particle,int k,int r,int scale){
         double b;
         double c;
@@ -137,6 +128,80 @@ public class Ultimate extends BukkitRunnable{
             location.getWorld().spawnParticle(particle, locationTemp.clone().add(new Vector(c / scale, b / scale, 1).rotateAroundX(pitch).rotateAroundY(yaw)), 3, 0, 0, 0, 0, options);
         }
     }
+}
+
+class ControlUltBlockDisplay extends BukkitRunnable{
+
+    private int times;
+    private int alltimes;
+    private BlockDisplay blockDisplay;
+    private Location location;
+    private int k;
+    private double pitch;
+    private double yaw;
+    private int r;
+    private int attackTime;
+    ControlUltBlockDisplay(int allTimes,Location location,double pitch,double yaw,int r,int attackTime){
+        alltimes = allTimes;
+        this.location = location;
+        this.k = 3;
+        this.pitch = pitch;
+        this.yaw = yaw;
+        this.r = r;
+        this.attackTime = attackTime;
+
+
+
+        blockDisplay = location.getWorld().spawn(location.clone().add(new Vector(-1*(r/10),-1*(r/10), 1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)), BlockDisplay.class);
+        Transformation transformation = blockDisplay.getTransformation();
+        transformation.getScale().set(2D);
+        blockDisplay.setTransformation(transformation);
+        blockDisplay.setBlock(Bukkit.createBlockData(Material.VERDANT_FROGLIGHT));
+    }
+
+    @Override
+    public void run() {
+        double l = config.getDouble("Ultimate.long");
+        double lNow = 0;
+        if(times <= 2*k){
+            Transformation transformation = blockDisplay.getTransformation();
+            lNow = (l/2)*(times)/(2*k);
+            transformation.getScale().set(r/5,r/5,lNow);
+            blockDisplay.setTransformation(transformation);
+            blockDisplay.setBrightness(new Display.Brightness(15,15));
+
+            if(times== 2*k && alltimes - 6*k <attackTime){
+                new ControlUltBlockDisplay(alltimes,location,pitch,yaw,r,attackTime).runTaskTimer(plugin,0,1);
+            }
+        }else {
+            if(times < 6*k){
+                blockDisplay.teleport(location.clone().add(new Vector(-1*(r/10),-1*(r/10),(times-2*k)*(l/2)/(2*k)+1).rotateAroundX(pitch).rotateAroundY(yaw)));
+                if(times >= 4*k){
+                    Transformation transformation = blockDisplay.getTransformation();
+                    lNow = (l/2)*(6*k - times)/(2*k);
+                    transformation.getScale().set(r/5,r/5,lNow);
+                    blockDisplay.setTransformation(transformation);
+                }
+            }else {
+
+                blockDisplay.remove();
+                cancel();
+            }
+        }
+        Location killerCore = location.clone().add(new Vector(0,0, 1+r/10).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw));
+        for(int i = 0;i<lNow - r/10;i++){
+            for(Player player : plugin.getServer().getOnlinePlayers()){
+                if(player.getLocation().distance(killerCore.add(new Vector(0,0, 1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)))<r/10){
+                    player.damage(20);
+                }
+            }
+        }
+
+
+        times++;
+        alltimes++;
+    }
+
 }
 
 
