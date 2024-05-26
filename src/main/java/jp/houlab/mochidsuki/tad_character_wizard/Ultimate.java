@@ -1,5 +1,6 @@
 package jp.houlab.mochidsuki.tad_character_wizard;
 
+import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -11,6 +12,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+
+import java.util.HashMap;
 
 import static jp.houlab.mochidsuki.tad_character_wizard.TAD_Character_Wizard.config;
 import static jp.houlab.mochidsuki.tad_character_wizard.TAD_Character_Wizard.plugin;
@@ -26,10 +29,18 @@ public class Ultimate extends BukkitRunnable{
         this.player = player;
         pitch = Math.toRadians(player.getPitch());
         yaw = Math.toRadians(-1 * player.getYaw());
+        location.getWorld().playSound(location,Sound.ENTITY_WITHER_SPAWN,100,1);
     }
     @Override
     public void run(){
         spawnParticle(location,player,times);
+        if(times < config.getDouble("Ultimate.prepareTime")) {
+            float a = (float) (times / config.getDouble("Ultimate.prepareTime"));
+            location.getWorld().playSound(location, Sound.ENTITY_WITHER_SPAWN, 0.3f, a);
+        } else if (times == config.getDouble("Ultimate.prepareTime")) {
+            //location.getWorld().stopSound(SoundStop.named(Sound.ENTITY_WITHER_SPAWN));
+            //location.getWorld().playSound(location, Sound.ENTITY_WITHER_SPAWN, 1, 1);
+        }
         times++;
     }
     private void spawnParticle(Location location, Player player,int times){
@@ -103,6 +114,20 @@ public class Ultimate extends BukkitRunnable{
             }
         } else if (times == prepareTime) {
             new ControlUltBlockDisplay(0,location,pitch,yaw,r,runTime).runTaskTimer(plugin,0,1);
+
+        } else if (times>=prepareTime) {
+            for(Player player1 : player.getServer().getOnlinePlayers()) {
+                double distance = r/10 + 30;
+                for (int i = 0; i < config.getInt("Ultimate.long"); i++) {
+                    Location location1 = location.clone().add(new Vector(0, 0, i).rotateAroundX(pitch).rotateAroundY(yaw));
+                    if(distance > player1.getLocation().distance(location1)){
+                        distance = player1.getLocation().distance(location1);
+                    }
+                }
+                player1.playSound(player1,Sound.ENTITY_WITHER_SPAWN,SoundCategory.MASTER, (float) (1-distance/(r/10+10)),4f);
+                //player1.playSound(player1,Sound.ENTITY_ENDER_DRAGON_AMBIENT,SoundCategory.MASTER, (float) (1-distance/(r/10+10)),2f);
+
+            }
         }
 
         if(times > prepareTime+runTime) {
@@ -152,11 +177,12 @@ class ControlUltBlockDisplay extends BukkitRunnable{
 
 
 
-        blockDisplay = location.getWorld().spawn(location.clone().add(new Vector(-1*(r/10),-1*(r/10), 1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)), BlockDisplay.class);
+        blockDisplay = location.getWorld().spawn(location.clone().add(new Vector(-1*(r/10),(r/10), 1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)), BlockDisplay.class);
         Transformation transformation = blockDisplay.getTransformation();
         transformation.getScale().set(2D);
+        transformation.getLeftRotation().rotateLocalX((float) Math.toRadians(90));
         blockDisplay.setTransformation(transformation);
-        blockDisplay.setBlock(Bukkit.createBlockData(Material.VERDANT_FROGLIGHT));
+        blockDisplay.setBlock(Bukkit.createBlockData(Material.DRAGON_EGG));
     }
 
     @Override
@@ -166,20 +192,20 @@ class ControlUltBlockDisplay extends BukkitRunnable{
         if(times <= 2*k){
             Transformation transformation = blockDisplay.getTransformation();
             lNow = (l/2)*(times)/(2*k);
-            transformation.getScale().set(r/5,r/5,lNow);
+            transformation.getScale().set(r/5,lNow,r/5);
             blockDisplay.setTransformation(transformation);
             blockDisplay.setBrightness(new Display.Brightness(15,15));
 
-            if(times== 2*k && alltimes - 6*k <attackTime){
+            if(times== k && alltimes - 6*k <attackTime){
                 new ControlUltBlockDisplay(alltimes,location,pitch,yaw,r,attackTime).runTaskTimer(plugin,0,1);
             }
         }else {
             if(times < 6*k){
-                blockDisplay.teleport(location.clone().add(new Vector(-1*(r/10),-1*(r/10),(times-2*k)*(l/2)/(2*k)+1).rotateAroundX(pitch).rotateAroundY(yaw)));
+                blockDisplay.teleport(location.clone().add(new Vector(-1*(r/10),(r/10),(times-2*k)*(l/2)/(2*k)+1).rotateAroundX(pitch).rotateAroundY(yaw)));
                 if(times >= 4*k){
                     Transformation transformation = blockDisplay.getTransformation();
                     lNow = (l/2)*(6*k - times)/(2*k);
-                    transformation.getScale().set(r/5,r/5,lNow);
+                    transformation.getScale().set(r/5,lNow,r/5);
                     blockDisplay.setTransformation(transformation);
                 }
             }else {
@@ -188,16 +214,15 @@ class ControlUltBlockDisplay extends BukkitRunnable{
                 cancel();
             }
         }
-        Location killerCore = location.clone().add(new Vector(0,0, 1+r/10).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw));
+        Location killerCore = location.clone().add(new Vector(0,-1, 1+r/10).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw));
         for(int i = 0;i<lNow - r/10;i++){
+            Location location1 = killerCore.clone().add(new Vector(0,0, i).rotateAroundX(pitch).rotateAroundY(yaw));
             for(Player player : plugin.getServer().getOnlinePlayers()){
-                if(player.getLocation().distance(killerCore.add(new Vector(0,0, 1).rotateAroundZ(Math.toRadians(times)).rotateAroundX(pitch).rotateAroundY(yaw)))<r/10){
+                if(player.getLocation().distance(location1)<r/10) {
                     player.damage(20);
                 }
             }
         }
-
-
         times++;
         alltimes++;
     }
