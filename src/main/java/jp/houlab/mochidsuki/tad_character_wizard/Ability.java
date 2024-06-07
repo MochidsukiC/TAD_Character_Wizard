@@ -27,7 +27,6 @@ public class Ability {
         double yaw = Math.toRadians(-1*player.getYaw());
         List<ArmorStand> armorStands = new ArrayList<>();
         List<BlockDisplay> blockDisplays = new ArrayList<>();
-        for(int ii = 0;ii< TAD_Character_Wizard.config.getInt("Ability.Health");ii++) {
             for (int i = 0; i < 5; i++) {
                 Location location = player.getLocation().clone().add(new Vector(i - 2, 0, 3).rotateAroundY(yaw));
                 location.setPitch(0);
@@ -47,7 +46,7 @@ public class Ability {
                     blockDisplays.add(blockDisplay);
                 }
             }
-        }
+
         new teleportShield(armorStands,blockDisplays,player).runTaskTimer(plugin,0,1);
     }
 }
@@ -68,7 +67,6 @@ class teleportShield extends BukkitRunnable{
         int iv = 0;
         int v = 0;
         double yaw = Math.toRadians(-1*player.getYaw());
-        for(int ii = 0;ii< TAD_Character_Wizard.config.getInt("Ability.Health");ii++) {
             for (int i = 0; i < 5; i++) {
                 Location location = player.getLocation().clone().add(new Vector(i - 2, 0, 3).rotateAroundY(yaw));
                 location.setPitch(0);
@@ -80,7 +78,6 @@ class teleportShield extends BukkitRunnable{
                     v++;
                 }
             }
-        }
 
         if(times > config.getInt("Ability.Time")*20){
             for(ArmorStand armorStand : armorStands){
