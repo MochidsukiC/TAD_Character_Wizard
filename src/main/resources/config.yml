@@ -1,4 +1,6 @@
 Ability:
+  Health: 3
+  Time: 30
 
 Ultimate:
   #単位は0.1ブロック

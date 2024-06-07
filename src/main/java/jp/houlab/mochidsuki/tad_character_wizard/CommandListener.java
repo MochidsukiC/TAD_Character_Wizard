@@ -16,6 +16,9 @@ public class CommandListener implements CommandExecutor {
                 sender.sendMessage("a");
                 new Ultimate(((Player)sender).getEyeLocation(), ((Player) sender)).runTaskTimer(plugin,0,1);
             }
+            if(strings[0].equalsIgnoreCase("abi")){
+                Ability.spawnShield((Player) sender);
+            }
         }
         return false;
     }
