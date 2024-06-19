@@ -4,15 +4,23 @@ import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.Structure;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.damage.DamageSource;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 
 import static jp.houlab.mochidsuki.tad_character_wizard.TAD_Character_Wizard.config;
@@ -23,17 +31,33 @@ public class Ultimate extends BukkitRunnable{
     final private Player player;
     final private double pitch;
     final private double yaw;
+    private ItemStack itemStack;
     private int times;
-    public Ultimate(Location location, Player player){
+    private final Entity entity;
+    public Ultimate(Location location, Player player, @Nullable ItemStack itemStack){
         this.location = location;
         this.player = player;
         pitch = Math.toRadians(player.getPitch());
         yaw = Math.toRadians(-1 * player.getYaw());
         location.getWorld().playSound(location,Sound.ENTITY_WITHER_SPAWN,100,1);
+
+        player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION,config.getInt("Ultimate.prepareTime")+config.getInt("Ultimate.attackTime"),255));
+        entity = location.getWorld().spawn(player.getLocation(), BlockDisplay.class);
+        if(itemStack != null){
+            /*
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            itemMeta.getEnchants().remove(Enchantment.LUCK);
+            itemStack.setItemMeta(itemMeta);
+
+             */
+            itemStack.removeEnchantment(Enchantment.LUCK);
+            this.itemStack = itemStack;
+        }
     }
     @Override
     public void run(){
         spawnParticle(location,player,times);
+        player.teleport(entity);
         if(times < config.getDouble("Ultimate.prepareTime")) {
             float a = (float) (times / config.getDouble("Ultimate.prepareTime"));
             location.getWorld().playSound(location, Sound.ENTITY_WITHER_SPAWN, 0.3f, a);
@@ -131,6 +155,9 @@ public class Ultimate extends BukkitRunnable{
         }
 
         if(times > prepareTime+runTime) {
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            itemMeta.addEnchant(Enchantment.LUCK,1,true);
+            itemStack.setItemMeta(itemMeta);
             cancel();
         }
         }

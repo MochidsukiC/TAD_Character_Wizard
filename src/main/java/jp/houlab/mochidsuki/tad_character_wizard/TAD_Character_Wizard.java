@@ -23,6 +23,9 @@ static public Plugin plugin;
         //command
         getCommand("tcw").setExecutor(new CommandListener());
 
+        //Event
+        getServer().getPluginManager().registerEvents(new Listener(),this);
+
     }
 
     @Override

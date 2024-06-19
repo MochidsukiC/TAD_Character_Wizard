@@ -17,9 +17,13 @@ public class Listener implements org.bukkit.event.Listener {
             switch (event.getMaterial()) {
                 case WILD_ARMOR_TRIM_SMITHING_TEMPLATE: { //マテリアルはあとで決定する
                     Ability.spawnShield(event.getPlayer());
+                    break;
                 }
-                case STICK:{
-                    new Ultimate((event.getPlayer()).getEyeLocation(), (event.getPlayer())).runTaskTimer(plugin,0,1);
+                case STICK: {
+                    if (!event.getItem().getEnchantments().isEmpty()){
+                        new Ultimate((event.getPlayer()).getEyeLocation(), (event.getPlayer()),event.getItem()).runTaskTimer(plugin, 0, 1);
+                    }
+                    break;
                 }
             }
         }
