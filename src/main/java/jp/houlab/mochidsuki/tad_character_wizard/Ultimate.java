@@ -24,7 +24,7 @@ public class Ultimate extends BukkitRunnable{
     final private double pitch;
     final private double yaw;
     private int times;
-    Ultimate(Location location, Player player){
+    public Ultimate(Location location, Player player){
         this.location = location;
         this.player = player;
         pitch = Math.toRadians(player.getPitch());
